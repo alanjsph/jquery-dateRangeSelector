@@ -985,12 +985,12 @@
             }
         });
 
-        $(window).bind('resize.datepicker');
+        $(window).bind('resize.datepicker', calcPosition);
 
         return this;
 
         function IsOwnDatePickerClicked(evt, selfObj) {
-            return (evt.target == selfObj);
+            return (selfObj.contains(evt.target) || evt.target == selfObj || (selfObj.childNodes != undefined && $.inArray(evt.target, selfObj.childNodes) >= 0));
         }
 
         function init_datepicker() {
@@ -1009,7 +1009,7 @@
             $(opt.container).append(box);
 
             if (!opt.inline) {
-                //calcPosition();
+                calcPosition();
             } else {
                 box.addClass('inline-wrapper');
             }
@@ -1244,33 +1244,32 @@
 
         }
 
-        //
-        // function calcPosition() {
-        //     if (!opt.inline) {
-        //         var offset = $(self).offset();
-        //         if ($(opt.container).css('position') == 'relative') {
-        //             var containerOffset = $(opt.container).offset();
-        //             box.css({
-        //                 top: offset.top - containerOffset.top + $(self).outerHeight() + 4,
-        //                 left: offset.left - containerOffset.left
-        //             });
-        //         } else {
-        //             if (offset.left < 460) //left to right
-        //             {
-        //                 box.css({
-        //                     top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
-        //                     left: offset.left
-        //                 });
-        //             }
-        //              else {
-        //                 box.css({
-        //                     top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
-        //                     left: offset.left + $(self).width() - box.width() - 16
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+
+        function calcPosition() {
+            if (!opt.inline) {
+                var offset = $(self).offset();
+                if ($(opt.container).css('position') == 'relative') {
+                    var containerOffset = $(opt.container).offset();
+                    box.css({
+                        top: offset.top - containerOffset.top + $(self).outerHeight() + 4,
+                        left: offset.left - containerOffset.left
+                    });
+                } else {
+                    if (offset.left < 460) //left to right
+                    {
+                        box.css({
+                            top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
+                            left: offset.left
+                        });
+                    } else {
+                        box.css({
+                            top: offset.top + $(self).outerHeight() + parseInt($('body').css('border-top') || 0, 10),
+                            left: offset.left + $(self).width() - box.width() - 16
+                        });
+                    }
+                }
+            }
+        }
 
         // Return the date picker wrapper element
         function getDatePicker() {
@@ -1278,7 +1277,7 @@
         }
 
         function open(animationTime) {
-            //calcPosition();
+            calcPosition();
             redrawDatePicker();
             checkAndSetDefaultValue();
             if (opt.customOpenAnimation) {
